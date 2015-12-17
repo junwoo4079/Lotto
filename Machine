@@ -1,0 +1,447 @@
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+
+public class Machine extends LottoRich{
+	
+	
+	JPanel pn, 
+	       select_pn,
+	       myNum_pn,
+	       win_pn,
+	       bonus_pn;// 프레임 바로 위의 패널, 당첨 번호 패널, 공이 들어있는 패널
+	JButton mix_bt,
+			select_bt,
+			myNum_bt,
+			win_bt,
+			back_bt; // 선택, 섞기 버튼
+	Thread th; // 스레드 이용
+	int[] x = new int[45],
+	      y = new int[45]; // 45개의 공의 x, y좌표를 할당하기 위한 배열변수
+	
+	ImageIcon[] icon; // 번호 그림을 담을 아이콘
+	JLabel[] num; // 아이콘을 담을 라벨	
+	JLabel mix_lb,
+		   win_lb,
+		   myNum_lb,
+		   message_lb,
+		   bonus_lb; // 각 제목을 표시하는 라벨
+	JTextField myNum_tf1,
+			   myNum_tf2,
+			   myNum_tf3,
+			   myNum_tf4,
+			   myNum_tf5,
+			   myNum_tf6,
+			   message_tf,
+			   win_tf; 							 // 숫자입력, 메시지 출력, 당첨 정보를 나타내는 텍스트필드
+	
+	static int win_count=0; 					 // 일치하는 번호 숫자
+	int num_array[] = new int[6]; 
+	
+	static final int BALL_QUANTITY = 7;			 //당첨번호의 개수가 변하지 않도록 하기위한 변수
+	Random random = new Random(); 				 // 랜덤 객체 생성
+	boolean start = false; 						 // 섞기 버튼을 한번만 누르도록 한다. 또한 버튼 누르기 전에 아이콘 표시를 하지 않기 위한 변수
+	static int input_count = 0; 				 // 7개의 공을 추출하기 위한 변수(1씩 증가)
+	static int[] check = new int[BALL_QUANTITY]; // 중복 숫자 체크 배열
+	boolean input = false; 						 // 입력완료 버튼을 눌러야 나머지 기능 수행가능 하도록 제어하는 변수
+	boolean bonus_num = false;
+	
+	
+ public void start() {
+	JPanel pn = new JPanel();
+	pn.setLayout(null);
+	frame_LottoRich.add(pn);
+	myNum_bt = new JButton("입력완료");
+												 // 내 번호 입력 라벨
+	myNum_lb = new JLabel("내 번호 입력");
+	pn.add(myNum_lb); 							 // 패널에 추가
+	myNum_lb.setBounds(0, 0, 800, 120); 		 //크기와위치 지정
+	myNum_lb.setBackground(new Color(183, 240, 177));// (적색 녹색 청색) 색깔지정
+	myNum_lb.setOpaque(true); 						// 배경색이 출력되도록 불투명성 설정
+	myNum_lb.setHorizontalAlignment(JLabel.CENTER); // 라벨의 중앙에 텍스트가 오도록 정렬
+  
+	// 내 번호 입력 패널
+	myNum_pn = new JPanel();
+	pn.add(myNum_pn);  							// 패널에 추가
+	myNum_pn.setBounds(230, 60, 350, 50);		// 크기와 위치 지정	
+	myNum_pn.setBackground(new Color(134, 229, 127)); // 색깔지정
+	myNum_pn.setLayout(null); 					// 레이아웃 값 null로 설정
+  
+	// 내 번호 입력 텍스트필드
+	myNum_method(); 
+  
+	// 내 번호 입력 완료버튼
+	
+	pn.add(myNum_bt); //패널에 추가
+	myNum_bt.setBounds(350, 120, 100, 30); //위치와 크기 지정
+
+	// 번호공 섞는 제목 라벨
+	mix_lb = new JLabel("섞기 박스");
+	pn.add(mix_lb); //패널에 추가
+	mix_lb.setBounds(0, 150, 800, 30); // 위치와 크기 지정
+	mix_lb.setBackground(new Color(204, 61, 61)); // 색깔 지정
+	mix_lb.setOpaque(true); // 배경색이 출력되도록 불투명성 설정
+	mix_lb.setHorizontalAlignment(JLabel.CENTER); // 라벨의 중앙에 텍스트가 오도록 정렬
+ 
+	// 번호공 섞는 박스 패널
+	mixbox mixbox_pn = new mixbox();
+	pn.add(mixbox_pn); // 패널에 추가
+	mixbox_pn.setBounds(0, 180, 800, 200); // 위치와 크기 지정
+	mixbox_pn.setBackground(new Color(255, 193, 158));// 색깔 지정
+
+	// 번호공 섞는 제목 라벨
+	win_lb = new JLabel("추첨 박스");
+	pn.add(win_lb); // 패널에 추가
+	win_lb.setBounds(0, 380, 700, 40); // 위치와 크기 지정
+	win_lb.setBackground(Color.BLACK); // 색 지정
+	win_lb.setForeground(Color.YELLOW); // 색 지정
+	win_lb.setOpaque(true); // 불투명성 설정
+	win_lb.setHorizontalAlignment(JLabel.CENTER); // 라벨의 중앙에 텍스트가 오도록 정렬
+	win_lb.setLayout(null); // 레이아웃 값 null로 설정
+		
+	// 보너스공 라벨
+	bonus_lb = new JLabel("보너스공");
+	pn.add(bonus_lb); // 패널에 추가
+	bonus_lb.setBounds(700, 380, 100, 40); // 위치와 크기 지정
+	bonus_lb.setBackground(Color.BLUE); // 색지정
+	bonus_lb.setForeground(Color.WHITE); // 색지정
+	bonus_lb.setFont(new Font(null, Font.BOLD, 11)); // (글꼴, 스타일, 크기) 폰트 지정
+	bonus_lb.setHorizontalAlignment(JLabel.CENTER); // 라벨의 중앙에 텍스트가 오도록 정렬
+	bonus_lb.setOpaque(true); // 불투명성 설정
+ 
+	// 번호 추첨 박스 패널
+	select_pn = new JPanel(); 
+	pn.add(select_pn); // 패널에 추가
+	select_pn.setBounds(0, 420, 800, 60); // 위치와 크기 지정
+	select_pn.setBackground(new Color(250, 237, 125)); // 색 지정
+	select_pn.setLayout(null); // 레이아웃 갑 null로 설정
+  
+	// 보너스 번호 패널
+	bonus_pn = new JPanel();
+	select_pn.add(bonus_pn); //select 패널에 추가
+	bonus_pn.setBounds(700, 0, 100, 80); // 위치와 크기 지정
+	bonus_pn.setBackground(new Color(243, 97 ,220)); // 색 지정
+	bonus_pn.setLayout(null); // 레이아웃 값 null로 설정
+  
+	// 섞기 버튼
+	mix_bt = new JButton("섞기");
+	pn.add(mix_bt); // 패널에 추가
+	mix_bt.setBounds(230, 500, 100, 80); // 크기와 위치 지정
+	// 추첨 버튼
+	select_bt = new JButton("추첨");
+	pn.add(select_bt); // 패널에 추가
+	select_bt.setBounds(330, 500, 100, 80); // 크기와 위치 지정
+	// 뒤로가기 버튼
+	back_bt = new JButton("뒤로가기");
+	pn.add(back_bt);
+	back_bt.setBounds(430, 500, 100, 80);
+	
+	// 당첨 확인 패널
+	win_pn = new JPanel();
+	pn.add(win_pn); // 패널에 추가
+	win_pn.setBounds(200, 600, 350, 100); // 위치와 크기 지정 
+	win_pn.setBackground(Color.RED); // 색 지정
+  
+	// 당첨 확인 버튼
+	win_bt = new JButton("당첨 확인");
+	win_pn.add(win_bt); // win패널에 추가
+	win_pn.setLayout(null); // 레이아웃 값 null로 설정
+	win_bt.setBounds(30, 35, 100, 30); // 위치와 크기 지정
+  
+	// 당첨 확인 텍스트필드
+	win_tf = new JTextField();
+	win_pn.add(win_tf); // win패널에 추가
+	win_tf.setBounds(130, 35, 180, 30); // 위치와 크기 지정
+  
+	// 메시지 라벨
+	message_lb = new JLabel("Message");
+	pn.add(message_lb); // 패널에 추가
+	message_lb.setBounds(0, 700, 800, 50); // 위치와 크기 지정
+	message_lb.setBackground(Color.RED); // 색 지정
+	message_lb.setForeground(Color.WHITE); // 색 지정
+	message_lb.setOpaque(true); // 불투명성 설정
+
+	// 메시지 텍스트필드
+	
+	message_tf = new JTextField();
+	pn.add(message_tf); // 패널에 추가
+	message_tf.setBounds(55, 700, 745, 50); // 위치와 크기 지정
+  
+
+	// ActionListener 구현 클래스 객체 생성
+	action_class ac = new action_class();
+  
+	// 입력완료, 섞기, 선택 버튼에 Action 이벤트 발생
+	myNum_bt.addActionListener(ac);
+	mix_bt.addActionListener(ac);
+	select_bt.addActionListener(ac);
+	win_bt.addActionListener(ac);
+	back_bt.addActionListener(ac);
+	// mixbox_pn를 스레드에 저장
+	th = new Thread(mixbox_pn);
+ }
+ 
+ // 내 번호 텍스트필드 메소드
+ public void myNum_method(){
+
+
+	 
+	 myNum_tf1 = new JTextField(1);
+	 myNum_tf1.setText("");	
+	 myNum_pn.add(myNum_tf1); // Mynum 패널에 추가
+	 myNum_tf1.setBounds(30, 10, 30, 20); // 위치와 크기 지정
+	 myNum_tf1.setHorizontalAlignment(JTextField.CENTER); // 정렬
+ 
+	 myNum_tf2 = new JTextField(1);
+	 myNum_tf2.setText("");
+  	 myNum_pn.add(myNum_tf2);
+  	 myNum_tf2.setBounds(90, 10, 30, 20);
+  	 myNum_tf2.setHorizontalAlignment(JTextField.CENTER);
+  
+  	 myNum_tf3 = new JTextField(1);
+  	 myNum_tf3.setText("");
+  	 myNum_pn.add(myNum_tf3);
+  	 myNum_tf3.setBounds(140, 10, 30, 20);
+  	 myNum_tf3.setHorizontalAlignment(JTextField.CENTER);
+  
+  	 myNum_tf4 = new JTextField(1);
+  	 myNum_tf4.setText("");
+  	 myNum_pn.add(myNum_tf4);
+  	 myNum_tf4.setBounds(190, 10, 30, 20);
+  	 myNum_tf4.setHorizontalAlignment(JTextField.CENTER);
+  
+  	 myNum_tf5 = new JTextField(1);
+  	 myNum_tf5.setText("");
+  	 myNum_pn.add(myNum_tf5);
+  	 myNum_tf5.setBounds(240, 10, 30, 20);
+  	 myNum_tf5.setHorizontalAlignment(JTextField.CENTER);
+  
+  	 myNum_tf6 = new JTextField(1);
+  	 myNum_tf6.setText("");
+  	 myNum_pn.add(myNum_tf6);
+  	 myNum_tf6.setBounds(290, 10, 30, 20);
+  	 myNum_tf6.setHorizontalAlignment(JTextField.CENTER);
+ }
+ 
+ // 공의 이미지  클래스
+class mixbox extends JPanel implements Runnable {
+	// 번호공 생성 및 번호 할당
+	 public mixbox() {
+		 num = new JLabel[45]; //아이콘을 담을 배열 
+		 icon = new ImageIcon[45]; //아이콘 배열 
+		 //이미지를 가져오는 for문
+		 for (int i = 0; i < 45; i++) {
+			 icon[i] = new ImageIcon("C:\\Users\\동기\\workspace\\LottoRich\\image\\" + (i + 1) + ".png"); //45개의 이미지를 배열에 저장
+			 num[i] = new JLabel(icon[i]); // 당첨번호를 선택하기 위해 num에 저장
+		 }
+	 }
+
+	 public void paint(Graphics g) {
+		 // 패널의 이미지를 지우면서
+		 super.paint(g);
+		 // 이미지를 그린다.
+		 if (start == true) { // 섞기 버튼을 눌렀을 때 start에 true값을 줘서 if문 수행 
+			 for (int i = 0; i < 45; i++) {
+				 g.drawImage(icon[i].getImage(), x[random.nextInt(45)], y[random.nextInt(45)], this); 
+				 // drawImage 메소드 호출  
+				 
+			 }
+		 }
+	 }
+
+	 //스레드
+	 public void run() {
+		 // 이미지의 x, y 좌표를 배열에 랜덤으로 받는다
+		 for (int i = 0; i < 45; i++) {
+			 x[i] = random.nextInt(700);
+			 y[i] = random.nextInt(250);
+		 }
+	
+		 for (int j = 0; ; j++) {
+			// 무한루프를 돌리면서 그린다.
+			repaint(); //repaint메소드 호출
+			try {
+				Thread.sleep(60); // 이미지는 0.06초의 간격을 두며 그려진다.
+			} 
+			catch (InterruptedException ex) {
+			
+			}
+		}
+	 }
+}
+
+	// 숫자 미입력 및 중복 입력 검사 메소드
+	public void myNum_input(){
+		int dup_count=0; // 중복 되는숫자  
+		if(myNum_tf1.getText().equals("") || 
+		   myNum_tf2.getText().equals("") ||
+		   myNum_tf3.getText().equals("") || 
+		   myNum_tf4.getText().equals("") ||
+		   myNum_tf5.getText().equals("") ||
+		   myNum_tf6.getText().equals("")){
+			// 텍스트 필드에 공백이 있을시 메시지 출력
+			message_tf.setText("숫자를 빠짐없이 입력해주세요.");
+		}
+		else{
+			//num_array[]에 myNum의 값을 int형으로 변환
+			num_array[0] = Integer.parseInt(myNum_tf1.getText()); 
+			num_array[1] = Integer.parseInt(myNum_tf2.getText());
+			num_array[2] = Integer.parseInt(myNum_tf3.getText());
+			num_array[3] = Integer.parseInt(myNum_tf4.getText());
+			num_array[4] = Integer.parseInt(myNum_tf5.getText());
+			num_array[5] = Integer.parseInt(myNum_tf6.getText());
+			
+			//i와j가 같지 않을때 변수의 값이 같다면 dup_count++를 증가시켜 중복을 체크
+			for(int i=0; i<6; i++){
+				for(int j=0; j<6; j++){
+					if(i != j && num_array[i] == num_array[j])
+						dup_count++;
+				}
+			}
+   
+			//count값이 0이상이면 메시지 출력
+			if(dup_count > 0){
+				message_tf.setText("숫자를 중복되지 않게 입력하세요.");
+			}
+			// 올바르게 입력한경우 메시지 출력
+			else{
+				message_tf.setText("입력이 완료되었습니다.");
+				input = true; // input값을 true로 바꾸어 섞기버튼사용가능
+			}
+		}
+	}
+ 
+ 
+	// 당첨 확인 메소드
+	public void win_check(){
+		
+		//내가 고른 번호와 당첨번호 비교
+		for(int i=0; i<BALL_QUANTITY-1; i++){
+			for(int j=0; j<6; j++){
+				if((check[i]+1) == num_array[j])
+					win_count++;
+			}
+		}
+		//보너스 번호 와 비교
+		for(int i=0; i<6; i++){
+			if(num_array[i] == (check[6]+1)) //내가 입력한 번호와 보너스 번호가 일치하면
+				bonus_num = true; 
+		}
+	}
+
+ // 메세지 출력 클래스
+ class action_class implements ActionListener {
+	 public void actionPerformed(ActionEvent e) {
+		 JButton bt = (JButton) e.getSource(); // 이벤트 발생한 오브젝트를 파악
+		
+		 //입력완료 버튼
+		 if (bt.getText().equals("입력완료")){
+			 myNum_input(); // 숫자 미입력 및 중복 입력 검사메소드 호출 
+		 } 
+		 
+		 //섞기 버튼
+		 else if (bt.getText().equals("섞기") && start == false){ //섞기 버튼을 한번만 누르게 하기위해
+			 //입력 완료가 되지 않았을  때
+			
+			 if(input == false){
+				 message_tf.setText("입력완료 버튼을 먼저 누르세요.");
+			 }
+			 else{
+				 start = true;
+				 th.start(); // 스레드 시작
+			 }
+		 } 
+		 else if(bt.getText().equals("뒤로가기")) {
+			frame_LottoRich.setVisible(false);
+		 }
+		 //추첨 버튼
+		 else if (bt.getText().equals("추첨")) {
+			 //입력 완료가 되지 않았을때 
+			 if(input == false){
+				 message_tf.setText("입력완료 버튼을 먼저 누르세요.");
+			 }
+			 else{
+				 if (input_count < BALL_QUANTITY) { // 7개의 이미지만 가지기 위해
+					 check[input_count] = random.nextInt(45); //check배열에 값 저장
+					 for (int i = 0; i < input_count; i++) { // 중복 체크를 위한 반복문
+						 if (check[i] == check[input_count]) { // 중복이 있을 시에
+							 check[input_count] = random.nextInt(45); // 다시 번호 할당
+							 i = 0; // 다시 처음부터 중복 검사
+						 }
+					 }
+					 
+					 if(input_count < 6) //추첨 번호
+					 {
+						 select_pn.add(num[check[input_count]]);
+						 num[check[input_count]].setBounds((input_count * 50), 0, 50, 50);
+					 }
+					 else //보너스 번호
+					 {
+						 bonus_pn.add(num[check[input_count]]);
+						 num[check[input_count]].setBounds(0, 0, 50, 50);
+					 }
+					 
+					 input_count++; 
+				 }
+			 }
+		 } 
+		 //당첨 확인 버튼
+		 else if(bt.getText().equals("당첨 확인")){
+			 if(input == false){
+				 message_tf.setText("입력완료 버튼을 먼저 누르세요.");
+			 }
+			 else if(input_count != BALL_QUANTITY){ // 7개의 번호를 선택하지 않았을 때
+				 message_tf.setText("7개의 당첨 번호를 모두 선택하세요.");
+			 }
+   
+			 else{
+				 win_check(); //당첨확인 메소드 호출
+				 win_tf.setHorizontalAlignment(JTextField.CENTER); // 가운데로 정렬
+				 // 결과
+				 switch(win_count){
+				 case 0:
+					 win_tf.setText("0개 당첨");
+					 break;
+				 case 1:
+					 win_tf.setText("1개 당첨");
+					 break;
+				 case 2:
+					 win_tf.setText("2개 당첨");
+					 break;
+				 case 3:
+					 win_tf.setText("3개 당첨 (5등)");
+					 break;
+				 case 4:
+					 win_tf.setText("4개 당첨 (4등)");
+					 break;
+				 // 추첨번호 5개가 맞았을 때와 추첨번호 4개와 보너스번호 1개가 맞았을 때
+				 case 5:
+					 if(bonus_num = true){
+						 win_tf.setText("6개 당첨 (2등)");
+						 break;
+					 }
+					 else{
+						 win_tf.setText("5개 당첨 (3등)");
+						 break;
+					 }
+				 case 6:
+					 win_tf.setText("6개 당첨 (1등)");
+					 break;
+				
+				 }
+			 }
+		 }
+	 }
+ }
+
+}
