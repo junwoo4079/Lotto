@@ -1,0 +1,39 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+public class LottoRich implements ActionListener {
+	
+	
+	final int width = 800;
+	final int height = 800;
+	ImageIcon icon = new ImageIcon("C:\\Users\\동기\\workspace\\LottoRich\\image\\unnamed.png");
+	JFrame frame_LottoRich = new JFrame("로또 리치 ! ! ! ");
+	public LottoRich() {
+		
+		
+		JButton button = new JButton(icon);
+		frame_LottoRich.setVisible(true);
+		frame_LottoRich.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame_LottoRich.setSize(width, height);
+		frame_LottoRich.add(button);
+		button.addActionListener(this);
+		
+	}
+	public void setting() {
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		
+		Inpormation_Save inSave = new Inpormation_Save();
+		inSave.Login();
+
+	}
+
+	
+
+		
+}
