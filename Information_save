@@ -1,0 +1,247 @@
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.Arrays;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+public class Inpormation_Save extends LottoRich{
+
+	
+	JPanel  pn,
+			GameStart_pn,
+			inpormation_pn,
+			My_number_pn;
+
+	
+	ButtonGroup buttonGroup = new ButtonGroup();
+	
+	JButton Gamein_bt,
+			Register_bt;
+		
+	
+	
+	JRadioButton	male_bt,
+					female_bt;
+
+	
+	JLabel name_la,
+		   birthday_la,
+		   birthday_year_la,
+		   gender_la,
+		   from_la,
+		   mynumber_la;
+	
+	
+	
+	JTextField name_tf,
+			   birthday_year,
+			   mynumber_tf;
+	
+	
+	
+	JComboBox<String> birthday_month = new JComboBox<String>(new String[] {"12월","11월","10월","9월","8월","7월","6월","5월","4월","3월","2월","1월"});
+	JComboBox<String> birthday_day = new JComboBox<String>(new String[] {"31일","30일","29일","28일","27일","26일","25일","24일","23일","22일","21일","20일","19일","18일","17일","16일","15일","14일","13일","12일","11일","10일","9일","8일","7일","6일","5일","4일","3일","2일","1일"});
+	JComboBox<String> From_cb = new JComboBox<String>(new String[] {"서울","부산","대구","대전","광주","울산","경기","경남","경북","전남","전북","충남","충북","강원","제주"});
+
+
+
+	public void Login() {
+		
+	  
+		// TODO Auto-generated method stub
+		pn = new JPanel();
+		frame_LottoRich.add(pn);
+		pn.setLayout(null);
+		birthday_year_la = new JLabel("년");
+		Register_bt = new JButton("등록&번호받기");
+		name_tf = new JTextField(50);
+		name_la = new JLabel("이름 : ");
+		gender_la = new JLabel("성별: ");
+		birthday_year = new JTextField(30);
+		birthday_la = new JLabel("생년월일 : ");
+		female_bt = new JRadioButton("여성");
+		male_bt = new JRadioButton("남성");
+		inpormation_pn = new JPanel();
+		from_la = new JLabel("출신지역 :");
+		pn.add(inpormation_pn ); // 패널에 추가
+		inpormation_pn.setLayout(null);
+		inpormation_pn .setBounds(0, 0, 800, 300); // 위치와 크기 지정
+		inpormation_pn .setBackground(Color.orange); // 색 지정
+		inpormation_pn .setForeground(Color.WHITE); // 색 지정
+		inpormation_pn .setOpaque(true); // 불투명성 설정
+		//JLabel
+		inpormation_pn.add(name_la);
+		name_la.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		name_la.setBounds(0, 0, 100, 30);
+		
+		inpormation_pn.add(birthday_la);
+		birthday_la.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		birthday_la.setBounds(0, 50, 200, 30);
+		//JTextfied
+		inpormation_pn.add(name_tf);
+		name_tf.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		name_tf.setBounds(100,0,100,40);
+		//RadioButton
+		buttonGroup.add(female_bt);
+		buttonGroup.add(male_bt);
+		
+		//Combobox
+		inpormation_pn.add(birthday_year);
+		birthday_year.setBounds(150, 50, 70, 33);
+		birthday_year.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		inpormation_pn.add(birthday_year_la);
+		birthday_year_la.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		birthday_year_la.setBounds(220,50,40,30);
+		inpormation_pn.add(birthday_month);
+		birthday_month.setBounds(250, 50, 70, 30);
+		birthday_month.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,20));
+		
+		inpormation_pn.add(birthday_day);
+		birthday_day.setBounds(320, 50, 70, 30);
+		birthday_day.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,20));
+		
+		inpormation_pn.add(gender_la);
+		gender_la.setBounds(0,90,100,40);
+		gender_la.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		
+		inpormation_pn.add(female_bt);
+		inpormation_pn.add(male_bt);
+		male_bt.setBounds(80,90,90,30);
+		female_bt.setBounds(180,90,90,30);
+		male_bt.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		female_bt.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		
+		inpormation_pn.add(from_la);
+		from_la.setBounds(0, 140, 220, 40);
+		from_la.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		
+		inpormation_pn.add(From_cb);
+		From_cb.setBounds(150, 140, 90, 40);
+		From_cb.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		
+		inpormation_pn.add(Register_bt);
+		Register_bt.setBounds(0, 180, 800, 120);
+		
+		My_number_pn = new JPanel();
+		My_number_pn.setLayout(null);
+		mynumber_la = new JLabel("내 번호: ");
+		mynumber_tf = new JTextField(50);
+		pn.add(My_number_pn);
+		My_number_pn.setBounds(0, 300, 800, 200);
+		My_number_pn.setBackground(Color.LIGHT_GRAY);
+		My_number_pn.add(mynumber_la);
+		mynumber_la.setBounds(200,80,150,50);
+		mynumber_la.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		My_number_pn.add(mynumber_tf);
+		mynumber_tf.setBounds(350,80,320,50);
+		mynumber_tf.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,30));
+		
+		
+		
+		
+		
+	
+		GameStart_pn = new JPanel();
+		Gamein_bt = new JButton("입장");
+		pn.add(GameStart_pn);// 패널에 추가
+		GameStart_pn.setBounds(0, 500, 800, 300);	
+		GameStart_pn.add(Gamein_bt);
+		Gamein_bt.setBounds(10, 10, 750, 220);
+		Gamein_bt.setFont(new Font("고딕",Font.LAYOUT_RIGHT_TO_LEFT,250));
+		GameStart_pn.setBackground(new Color(134, 229, 127));
+		GameStart_pn.setLayout(null); 			
+		
+		
+		
+		
+		buttonListener al = new buttonListener();
+		
+		//버튼리스너
+		Register_bt.addActionListener(al);
+		Gamein_bt.addActionListener(al);
+		
+		
+	}
+	
+	
+	
+	
+	public Inpormation_Save(){
+		
+	}
+class buttonListener implements ActionListener {
+	public void actionPerformed(ActionEvent e) {
+		  int[] arr= new int[6];
+		    int i,j,k;
+		    int x;
+		    for(i=0;i<6;i++){  					 // 랜덤수 6개 생성
+		        x=(int)((Math.random()*45)+1);  // 랜덤함수 호출 (범위 1-45)
+		        arr[i]=x;
+
+		        for (j=0;j<i;j++){
+		            if(arr[i] == arr[j]){  // 생성된 수와 이전에 저장된 수를 비교
+		                x=(int)((Math.random()*45)+1);
+		                arr[i] = x;    // 다시 수를 생성
+		                i = i - 1;    // 다시 첨부터 같은 숫자가 있는가 비교
+		                break;
+		                
+		            }
+		        }
+		    }
+		    for(i=0; i<6; i++){        // 정렬 조건
+	            for(j=0; j<=i; j++){
+	                if(arr[i]<=arr[j]){
+	                    k=arr[i];
+	                    arr[i]=arr[j];
+	                    arr[j]=k;
+	                }
+	            }
+	        }
+			 JButton bt = (JButton) e.getSource();
+			 if(bt.getText().equals("입장")){
+				 Machine lotto = new Machine();
+				 lotto.start();
+			 }
+			 else if(bt.getText().equals("등록&번호받기")) {
+				 String text =Arrays.toString(arr);
+				 mynumber_tf.setText(text);
+					if(name_tf.getText().equals(""))
+					   mynumber_tf.setText("이름을 입력하세요");
+									
+				 
+					
+				 try {
+					String name = name_tf.getText();
+					String address = From_cb.getSelectedItem().toString();
+					String year = birthday_year.getText();
+					String month = birthday_month.getSelectedItem().toString();
+					String day = birthday_day.getSelectedItem().toString();
+					BufferedWriter writer =new BufferedWriter(new FileWriter("C:\\Users\\동기\\workspace\\LottoRich\\Register.txt"));
+					writer.write(name+ " ");
+					writer.write(address+ " ");
+					writer.write(year+ "년");
+					writer.write(month+ " ");
+					writer.write(day+ " ");
+					
+					writer.close();
+					
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				 
+			 }
+		 }
+	}
+}
